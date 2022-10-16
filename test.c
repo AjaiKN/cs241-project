@@ -3,6 +3,9 @@
 #include <stdbool.h>
 #include "readpng.h"
 
+// also see https://gist.github.com/niw/5963798
+// That might be simpler
+
 int main() {
 	readpng_version_info();
 
