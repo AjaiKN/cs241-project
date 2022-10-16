@@ -26,14 +26,17 @@ int main() {
 	double display_exponent = 1;
 	int channels = 0;
 	unsigned long rowbytes = 0;
-	unsigned char *ret;
-	ret = readpng_get_image(display_exponent, &channels, &rowbytes);
+	unsigned char *image_data;
+	image_data = readpng_get_image(display_exponent, &channels, &rowbytes);
 	printf("channels=%d rowbytes=%lu\n", channels, rowbytes);
 
 	readpng_cleanup(false);
 
 	fclose(fptr);
 
-	free(ret);
+	printf("rowbytes should be width*channels = %lu*%d = %lu\n", width, channels, width*channels);
+	printf("size of image_data should be width*height*channels = %lu*%lu*%d = %lu\n", width, height, channels, width*height*channels);
+
+	free(image_data);
 }
 
