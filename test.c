@@ -38,6 +38,16 @@ int main() {
 	printf("rowbytes should be width*channels = %lu*%d = %lu\n", width, channels, width*channels);
 	printf("size of image_data should be height*width*channels = %lu*%lu*%d = %lu\n", height, width, channels, height*width*channels);
 
+	/*
+	unsigned char *ptr = image_data;
+	for (unsigned long y = 0; y < height; y++) {
+		for (unsigned long x = 0; x < height; x++) {
+			if (y == 0) printf("%u %u %u %u\n", ptr[0], ptr[1], ptr[2], ptr[4]);
+			ptr += 4;
+		}
+	}
+	*/
+
 	free(image_data);
 }
 
