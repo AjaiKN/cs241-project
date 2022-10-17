@@ -38,7 +38,7 @@ int main() {
 	fclose(fptr);
 
 	printf("rowbytes should be width*channels = %lu*%d = %lu\n", width, channels, width*channels);
-	printf("size of image_data should be width*height*channels = %lu*%lu*%d = %lu\n", width, height, channels, width*height*channels);
+	printf("size of image_data should be height*width*channels = %lu*%lu*%d = %lu\n", height, width, channels, height*width*channels);
 
 	free(image_data);
 }
