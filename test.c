@@ -21,6 +21,8 @@ void to_grayscale(unsigned long height, unsigned long width, unsigned char *colo
 	}
 }
 
+// also see https://gist.github.com/niw/5963798
+// That might be simpler
 void png_to_array(char* filename, unsigned char **array_ptr, unsigned long *height, unsigned long *width, int *channels) {
 	readpng_version_info();
 
@@ -50,9 +52,6 @@ void png_to_array(char* filename, unsigned char **array_ptr, unsigned long *heig
 	printf("rowbytes should be width*channels = %lu*%d = %lu\n", *width, *channels, (*width)*(*channels));
 	printf("size of image_data should be height*width*channels = %lu*%lu*%d = %lu\n", *height, *width, *channels, (*height)*(*width)*(*channels));
 }
-
-// also see https://gist.github.com/niw/5963798
-// That might be simpler
 
 int main() {
 	unsigned long height, width;
