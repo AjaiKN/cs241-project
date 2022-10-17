@@ -29,8 +29,7 @@ int main() {
 	double display_exponent = 1;
 	int channels = 0;
 	unsigned long rowbytes = 0;
-	unsigned char *image_data;
-	image_data = readpng_get_image(display_exponent, &channels, &rowbytes);
+	unsigned char *image_data = readpng_get_image(display_exponent, &channels, &rowbytes);
 	printf("channels=%d rowbytes=%lu\n", channels, rowbytes);
 
 	readpng_cleanup(false);
