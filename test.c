@@ -1,7 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 #include "readpng.h"
+
+void to_grayscale(unsigned long height, unsigned long width, unsigned char *colored, unsigned char *gray) {
+	unsigned char *coloredPtr = colored;
+	unsigned char *grayPtr = gray;
+	for (unsigned long y = 0; y < height; y++) {
+		for (unsigned long x = 0; x < width; x++) {
+			double red   = *(coloredPtr + 0);
+			double green = *(coloredPtr + 1);
+			double blue  = *(coloredPtr + 2);
+			//unsigned char alpha = *(coloredPtr + 3);
+			// https://e2eml.school/convert_rgb_to_grayscale.html
+			*grayPtr = round(0.299*red + 0.587*green + 0.114*blue);
+			coloredPtr += 4;
+			grayPtr += 1;
+		}
+	}
+}
 
 // also see https://gist.github.com/niw/5963798
 // That might be simpler
@@ -46,6 +64,10 @@ int main() {
 		}
 	}
 
+	unsigned char *grayscaled = malloc(height * width * sizeof(unsigned char));
+	to_grayscale(height, width, image_data, grayscaled);
+
+	for (int i = 0; i < 100; i++) printf("%u\n", grayscaled[i]);
+
 	free(image_data);
 }
-
