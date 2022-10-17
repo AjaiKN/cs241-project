@@ -26,10 +26,9 @@ int main() {
 	int bg_ret = readpng_get_bgcolor(&red, &green, &blue);
 	printf("readpng_get_bgcolor returned %d \t red=%u green=%u blue=%u\n", bg_ret, red, green, blue);
 
-	double display_exponent = 1;
 	int channels = 0;
 	unsigned long rowbytes = 0;
-	unsigned char *image_data = readpng_get_image(display_exponent, &channels, &rowbytes);
+	unsigned char *image_data = readpng_get_image(&channels, &rowbytes);
 	printf("channels=%d rowbytes=%lu\n", channels, rowbytes);
 
 	readpng_cleanup(false);

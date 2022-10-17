@@ -204,9 +204,9 @@ int readpng_get_bgcolor(uch *red, uch *green, uch *blue)
 
 /* display_exponent == LUT_exponent * CRT_exponent */
 
-uch *readpng_get_image(double display_exponent, int *pChannels, ulg *pRowbytes)
+uch *readpng_get_image(int *pChannels, ulg *pRowbytes)
 {
-    double  gamma;
+    //double  gamma;
     png_uint_32  i, rowbytes;
     png_bytepp  row_pointers = NULL;
 
@@ -241,8 +241,8 @@ uch *readpng_get_image(double display_exponent, int *pChannels, ulg *pRowbytes)
      * this file may have come from--so if it doesn't have a file gamma, don't
      * do any correction ("do no harm") */
 
-    if (png_get_gAMA(png_ptr, info_ptr, &gamma))
-        png_set_gamma(png_ptr, display_exponent, gamma);
+    //if (png_get_gAMA(png_ptr, info_ptr, &gamma))
+        //png_set_gamma(png_ptr, display_exponent, gamma);
 
 
     /* all transformations have been registered; now update info_ptr data,
