@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include <assert.h>
+#include <limits.h>
 #include "readpng.h"
 
 void to_grayscale(unsigned long height, unsigned long width, unsigned char *colored, unsigned char *gray) {
@@ -54,23 +56,46 @@ void png_to_array(char* filename, unsigned char **array_ptr, unsigned long *heig
 }
 
 int main() {
-	unsigned long height, width;
-	int channels;
-	unsigned char *image_data;
-	png_to_array("L_00001.png", &image_data, &height, &width, &channels);
+	unsigned long left_height, left_width;
+	int left_channels;
+	unsigned char *left_image_data;
+	png_to_array("L_00001.png", &left_image_data, &left_height, &left_width, &left_channels);
+	unsigned char *left_grayscaled = malloc(left_height * left_width * sizeof(unsigned char));
+	to_grayscale(left_height, left_width, left_image_data, left_grayscaled);
 
-	unsigned char *ptr = image_data;
-	for (unsigned long y = 0; y < height; y++) {
-		for (unsigned long x = 0; x < width; x++) {
-			if (y == 0) printf("%u %u %u %u\n", ptr[0], ptr[1], ptr[2], ptr[3]);
-			ptr += 4;
+	unsigned long right_height, right_width;
+	int right_channels;
+	unsigned char *right_image_data;
+	png_to_array("R_00001.png", &right_image_data, &right_height, &right_width, &right_channels);
+	unsigned char *right_grayscaled = malloc(right_height * right_width * sizeof(unsigned char));
+	to_grayscale(right_height, right_width, right_image_data, right_grayscaled);
+
+	assert(left_height == right_height);
+	assert(left_width == right_width);
+	assert(left_height < INT_MAX);
+	assert(left_width < INT_MAX);
+	int width = (int) left_width;
+	int height = (int) left_height;
+
+	int *disparities = malloc(height * width * sizeof(int));
+	for (int y = 0; y < height; y++) {
+		for (int x_left = 0; x_left < width; x_left++) {
+			int min_difference = INT_MAX;
+			int best_x_right = -1;
+			for (int x_right = 0; x_right < width; x_right++) {
+				int diff = abs(left_grayscaled[width*y + x_left] - right_grayscaled[width*y + x_right]);
+				if (diff < min_difference) {
+					min_difference = diff;
+					best_x_right = x_right;
+				}
+			}
+			disparities[width*y + x_left] = abs(best_x_right - x_left);
 		}
 	}
+	for (int i = 0; i < width; i++) printf("%d ", disparities[i]);
+	printf("\n");
 
-	unsigned char *grayscaled = malloc(height * width * sizeof(unsigned char));
-	to_grayscale(height, width, image_data, grayscaled);
-
-	for (int i = 0; i < 100; i++) printf("%u\n", grayscaled[i]);
-
-	free(image_data);
+	free(disparities);
+	free(left_image_data);
+	free(right_image_data);
 }
