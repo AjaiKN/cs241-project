@@ -2,7 +2,7 @@ test
 *.o
 *~
 core
-vgcore.6828
+vgcore.*
 output.png
 input_dup.png
 left_gray.png
