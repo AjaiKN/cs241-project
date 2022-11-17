@@ -4,6 +4,6 @@
 
 - `cd libpng`
   - Run `./configure`
-	- Run `make`
+  - Run `make`
   - `cd ..` to go back to the project directory
 - `make`
