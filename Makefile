@@ -6,13 +6,15 @@ EXECUTABLES=test
 
 all: $(EXECUTABLES)
 
-test: test.o readpng.o
+test: test.o readpng.o write_png_file.o
 	gccx -o $@ $^ $(LIBPNG)
 
-test.o: test.c
-	gccx -c -o $@ $^
+test.o: test.c readpng.h write_png_file.h
+	gccx -c -o $@ $<
 readpng.o: readpng.c
-	gccx -c -o $@ $^
+	gccx -c -o $@ $<
+write_png_file.o: write_png_file.c
+	gccx -c -o $@ $<
 
 clean:
 	rm $(EXECUTABLES) *.o

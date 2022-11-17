@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <limits.h>
 #include "readpng.h"
+#include "write_png_file.h"
 
 void to_grayscale(unsigned long height, unsigned long width, unsigned char *colored, unsigned char *gray) {
 	unsigned char *coloredPtr = colored;
@@ -58,9 +59,9 @@ void png_to_array(char* filename, unsigned char **array_ptr, unsigned long *heig
 int main() {
 	unsigned long left_height, left_width;
 	int left_channels;
-	unsigned char *left_image_data;
+	unsigned char *left_image_data; // height*width*channels
 	png_to_array("L_00001.png", &left_image_data, &left_height, &left_width, &left_channels);
-	unsigned char *left_grayscaled = malloc(left_height * left_width * sizeof(unsigned char));
+	unsigned char *left_grayscaled = malloc(left_height * left_width * sizeof(unsigned char)); // height*width
 	to_grayscale(left_height, left_width, left_image_data, left_grayscaled);
 
 	unsigned long right_height, right_width;
@@ -95,6 +96,27 @@ int main() {
 	for (int i = 0; i < width; i++) printf("%d ", disparities[i]);
 	printf("\n");
 
+	unsigned char *output_image = malloc(height * width * 4 * sizeof(int));
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+			int disparities_index = width*y + x;
+			int disparity = disparities[disparities_index];
+			int output_image_index = disparities_index * 4;
+			double disparity_scaled = (double) disparity / (double) width;
+			double distance = 1.0 / disparity_scaled;
+			double distance_scaled = 255.0 / distance;
+			assert(distance_scaled >= 0);
+			assert(distance_scaled <= 255);
+			unsigned char distance_output = (unsigned char) distance_scaled;
+			output_image[output_image_index + 0] = distance_output; //red
+			output_image[output_image_index + 1] = distance_output; //green
+			output_image[output_image_index + 2] = distance_output; //blue
+			output_image[output_image_index + 3] = 255;             //alpha
+		}
+	}
+	array_to_png("output.png", width, height, output_image);
+
+	free(output_image);
 	free(disparities);
 	free(left_image_data);
 	free(right_image_data);
