@@ -43,16 +43,18 @@ void png_to_array(char* filename, unsigned char **array_ptr, unsigned long *heig
 	unsigned char blue = 0;
 	int bg_ret = readpng_get_bgcolor(&red, &green, &blue);
 	printf("readpng_get_bgcolor returned %d \t red=%u green=%u blue=%u\n", bg_ret, red, green, blue);
+	assert(red == 0 && green == 0 && blue == 0);
 
 	unsigned long rowbytes = 0;
 	*array_ptr = readpng_get_image(channels, &rowbytes);
 	printf("channels=%d rowbytes=%lu\n", *channels, rowbytes);
+	assert((*channels) == 4);
+	assert((*width)*(*channels) == rowbytes);
 
 	readpng_cleanup(false);
 
 	fclose(fptr);
 
-	printf("rowbytes should be width*channels = %lu*%d = %lu\n", *width, *channels, (*width)*(*channels));
 	printf("size of image_data should be height*width*channels = %lu*%lu*%d = %lu\n", *height, *width, *channels, (*height)*(*width)*(*channels));
 }
 
