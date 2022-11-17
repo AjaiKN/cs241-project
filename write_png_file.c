@@ -59,7 +59,7 @@ void array_to_png(char *filename, int width, int height, unsigned char *array) {
 	//       png_bytep = png_byte* = unsigned char*
 	png_bytep *row_pointers = malloc(height * sizeof(png_bytep));
 	for (int y = 0; y < height; y++) {
-		row_pointers[y] = array + (y * height * 4);
+		row_pointers[y] = array + (y * width * 4);
 	}
 	write_png_file(filename, width, height, row_pointers);
 	free(row_pointers);
