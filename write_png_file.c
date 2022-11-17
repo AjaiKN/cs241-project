@@ -55,6 +55,8 @@ void write_png_file(char *filename, int width, int height, png_bytep *row_pointe
 
 void array_to_png(char *filename, int width, int height, unsigned char *array) {
 	printf("Printing!\n");
+	// NOTE: png_byte = unsigned char
+	//       png_bytep = png_byte* = unsigned char*
 	png_bytep *row_pointers = malloc(height * sizeof(png_bytep));
 	for (int y = 0; y < height; y++) {
 		row_pointers[y] = array + (y * height * 4);

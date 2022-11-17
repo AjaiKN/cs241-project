@@ -64,6 +64,22 @@ int main() {
 	unsigned char *left_grayscaled = malloc(left_height * left_width * sizeof(unsigned char)); // height*width
 	to_grayscale(left_height, left_width, left_image_data, left_grayscaled);
 
+	array_to_png("input_dup.png", left_width, left_height, left_image_data);
+
+	unsigned char *full_grayscaled = malloc(left_height*left_width*left_channels*sizeof(unsigned char));
+	for (unsigned long y = 0; y < left_height; y++) {
+		for (unsigned long x = 0; x < left_width; x++) {
+			unsigned long index = y*left_width + x;
+			unsigned long index_full = index * 4;
+			unsigned char val = left_grayscaled[index];
+			full_grayscaled[index_full + 0] = val;
+			full_grayscaled[index_full + 1] = val;
+			full_grayscaled[index_full + 2] = val;
+			full_grayscaled[index_full + 3] = 255;
+		}
+	}
+	array_to_png("left_gray.png", left_width, left_height, full_grayscaled);
+
 	unsigned long right_height, right_width;
 	int right_channels;
 	unsigned char *right_image_data;
@@ -93,7 +109,10 @@ int main() {
 			disparities[width*y + x_left] = abs(best_x_right - x_left);
 		}
 	}
-	for (int i = 0; i < width; i++) printf("%d ", disparities[i]);
+	for (int i = 0; i < width / 4; i++) printf("%d ", disparities[i]);
+	printf("\n");
+	printf("\n");
+	for (int i = 0; i < width / 4; i++) printf("%d ", disparities[width/4 + i]);
 	printf("\n");
 
 	unsigned char *output_image = malloc(height * width * 4 * sizeof(int));
@@ -114,6 +133,11 @@ int main() {
 			output_image[output_image_index + 3] = 255;             //alpha
 		}
 	}
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	printf("\n");
+	for (int i = 0; i < width; i++) printf("%u ", output_image[i * 4]);
 	array_to_png("output.png", width, height, output_image);
 
 	free(output_image);
