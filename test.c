@@ -134,11 +134,13 @@ int main() {
 			output_image[output_image_index + 3] = 255;             //alpha
 		}
 	}
+	/*
 	printf("\n");
 	printf("\n");
 	printf("\n");
 	printf("\n");
 	for (int i = 0; i < width; i++) printf("%u ", output_image[i * 4]);
+	*/
 	array_to_png("output.png", width, height, output_image);
 
 	free(output_image);
