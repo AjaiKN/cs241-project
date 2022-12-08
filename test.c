@@ -4,25 +4,9 @@
 #include <math.h>
 #include <assert.h>
 #include <limits.h>
+#include <string.h>
 #include "readpng.h"
 #include "write_png_file.h"
-
-void to_grayscale(unsigned long height, unsigned long width, unsigned char *colored, unsigned char *gray) {
-	unsigned char *coloredPtr = colored;
-	unsigned char *grayPtr = gray;
-	for (unsigned long y = 0; y < height; y++) {
-		for (unsigned long x = 0; x < width; x++) {
-			double red   = *(coloredPtr + 0);
-			double green = *(coloredPtr + 1);
-			double blue  = *(coloredPtr + 2);
-			//unsigned char alpha = *(coloredPtr + 3);
-			// https://e2eml.school/convert_rgb_to_grayscale.html
-			*grayPtr = round(0.299*red + 0.587*green + 0.114*blue);
-			coloredPtr += 4;
-			grayPtr += 1;
-		}
-	}
-}
 
 // also see https://gist.github.com/niw/5963798
 // That might be simpler
@@ -57,36 +41,29 @@ void png_to_array(char* filename, unsigned char **array_ptr, unsigned long *heig
 	printf("size of image_data should be height*width*channels = %lu*%lu*%d = %lu\n", *height, *width, *channels, (*height)*(*width)*(*channels));
 }
 
+double distance(unsigned char *left, unsigned char *right) {
+	int d0 = left[0] - right[0];
+	int d1 = left[1] - right[1];
+	int d2 = left[2] - right[2];
+	return sqrt(d0*d0 + d1*d1 + d2*d2);
+}
+
 int main() {
 	unsigned long left_height, left_width;
 	int left_channels;
 	unsigned char *left_image_data; // height*width*channels
 	png_to_array("L_00001.png", &left_image_data, &left_height, &left_width, &left_channels);
-	unsigned char *left_grayscaled = malloc(left_height * left_width * sizeof(unsigned char)); // height*width
-	to_grayscale(left_height, left_width, left_image_data, left_grayscaled);
+	//unsigned char left_image_data_arr[left_height][left_width][left_channels];
+	//memcpy(left_image_data_arr, left_image_data, left_height*left_width*left_channels*sizeof(unsigned char));
 
 	array_to_png("input_dup.png", left_width, left_height, left_image_data);
-
-	unsigned char *full_grayscaled = malloc(left_height*left_width*left_channels*sizeof(unsigned char));
-	for (unsigned long y = 0; y < left_height; y++) {
-		for (unsigned long x = 0; x < left_width; x++) {
-			unsigned long index = y*left_width + x;
-			unsigned long index_full = index * 4;
-			unsigned char val = left_grayscaled[index];
-			full_grayscaled[index_full + 0] = val;
-			full_grayscaled[index_full + 1] = val;
-			full_grayscaled[index_full + 2] = val;
-			full_grayscaled[index_full + 3] = 255;
-		}
-	}
-	array_to_png("left_gray.png", left_width, left_height, full_grayscaled);
 
 	unsigned long right_height, right_width;
 	int right_channels;
 	unsigned char *right_image_data;
 	png_to_array("R_00001.png", &right_image_data, &right_height, &right_width, &right_channels);
-	unsigned char *right_grayscaled = malloc(right_height * right_width * sizeof(unsigned char));
-	to_grayscale(right_height, right_width, right_image_data, right_grayscaled);
+	//unsigned char right_image_data_arr[right_height][right_width][right_channels];
+	//memcpy(right_image_data_arr, right_image_data, right_height*right_width*right_channels*sizeof(unsigned char));
 
 	assert(left_height == right_height);
 	assert(left_width == right_width);
@@ -98,14 +75,16 @@ int main() {
 	int *disparities = malloc(height * width * sizeof(int));
 	for (int y = 0; y < height; y++) {
 		for (int x_left = 0; x_left < width; x_left++) {
-			int min_difference = INT_MAX;
+			bool started = false;
+			double min_difference = 0;
 			int best_x_right = -1;
 			for (int x_right = x_left - 150; x_right < x_left + 150; x_right++) {
 				if (!(x_right >= 0 && x_right < width)) continue;
-				int diff = abs(left_grayscaled[width*y + x_left] - right_grayscaled[width*y + x_right]);
-				if (diff < min_difference) {
+				double diff = distance(&left_image_data[(width*y + x_left)*4], &right_image_data[(width*y + x_right)*4]);
+				if (!started || diff < min_difference) {
 					min_difference = diff;
 					best_x_right = x_right;
+					started = true;
 				}
 			}
 			disparities[width*y + x_left] = abs(best_x_right - x_left);
