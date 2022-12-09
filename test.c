@@ -66,7 +66,7 @@ double distance_single_pixel(unsigned char *left, unsigned char *right) {
 	return sqrt(d0*d0 + d1*d1 + d2*d2);
 }
 
-double distance(int width, int height, int channels, unsigned char left_image[height][width][channels], unsigned char right_image[height][width][channels], int x_left, int y_left, int x_right, int y_right) {
+double distance(int width, int height, int channels, unsigned char (*left_image)[width][channels], unsigned char (*right_image)[width][channels], int x_left, int y_left, int x_right, int y_right) {
 	double sum = 0;
 	int num_pixels_compared = 0;
 	int x_offset_start = -window_radius + max(0, window_radius - min(x_left, x_right));
@@ -87,7 +87,7 @@ int main() {
 	int left_channels;
 	unsigned char *left_image_data; // height*width*channels
 	png_to_array("L_00001.png", &left_image_data, &left_height, &left_width, &left_channels);
-	unsigned char left_image_data_arr[left_height][left_width][left_channels];
+	unsigned char (*left_image_data_arr)[left_width][left_channels] = malloc(left_height*left_width*left_channels*sizeof(unsigned char));
 	memcpy(left_image_data_arr, left_image_data, left_height*left_width*left_channels*sizeof(unsigned char));
 
 	array_to_png("input_dup.png", left_width, left_height, left_image_data);
@@ -96,7 +96,7 @@ int main() {
 	int right_channels;
 	unsigned char *right_image_data;
 	png_to_array("R_00001.png", &right_image_data, &right_height, &right_width, &right_channels);
-	unsigned char right_image_data_arr[right_height][right_width][right_channels];
+	unsigned char (*right_image_data_arr)[right_width][right_channels] = malloc(right_height*right_width*right_channels*sizeof(unsigned char));
 	memcpy(right_image_data_arr, right_image_data, right_height*right_width*right_channels*sizeof(unsigned char));
 
 	assert(left_height == right_height);
@@ -162,4 +162,6 @@ int main() {
 	free(disparities);
 	free(left_image_data);
 	free(right_image_data);
+	free(left_image_data_arr);
+	free(right_image_data_arr);
 }
