@@ -41,11 +41,43 @@ void png_to_array(char* filename, unsigned char **array_ptr, unsigned long *heig
 	printf("size of image_data should be height*width*channels = %lu*%lu*%d = %lu\n", *height, *width, *channels, (*height)*(*width)*(*channels));
 }
 
-double distance(unsigned char *left, unsigned char *right) {
+int max(int a, int b) {
+	if (a > b) {
+		return a;
+	} else {
+		return b;
+	}
+}
+
+int min(int a, int b) {
+	if (a < b) {
+		return a;
+	} else {
+		return b;
+	}
+}
+
+double distance_single_pixel(unsigned char *left, unsigned char *right) {
 	int d0 = left[0] - right[0];
 	int d1 = left[1] - right[1];
 	int d2 = left[2] - right[2];
 	return sqrt(d0*d0 + d1*d1 + d2*d2);
+}
+
+double distance(int width, int height, int channels, unsigned char left_image[height][width][channels], unsigned char right_image[height][width][channels], int x_left, int y_left, int x_right, int y_right) {
+	double sum = 0;
+	int num_pixels_compared = 0;
+	int x_offset_start = -2 + max(0, 2 - min(x_left, x_right));
+	int y_offset_start = -2 + max(0, 2 - min(y_left, y_right));
+	int x_offset_end = 2 - max(0, 2 - min(width-1 - x_left, width-1 - x_right));
+	int y_offset_end = 2 - max(0, 2 - min(height-1 - y_left, height-1 - y_right));
+	for (int x_offset = x_offset_start; x_offset <= x_offset_end; x_offset++) {
+		for (int y_offset = y_offset_start; y_offset <= y_offset_end; y_offset++) {
+			sum += distance_single_pixel(&left_image[y_left + y_offset][x_left + x_offset][0], &right_image[y_right + y_offset][x_right + x_offset][0]);
+			num_pixels_compared++;
+		}
+	}
+	return sum / num_pixels_compared;
 }
 
 int main() {
@@ -53,8 +85,8 @@ int main() {
 	int left_channels;
 	unsigned char *left_image_data; // height*width*channels
 	png_to_array("L_00001.png", &left_image_data, &left_height, &left_width, &left_channels);
-	//unsigned char left_image_data_arr[left_height][left_width][left_channels];
-	//memcpy(left_image_data_arr, left_image_data, left_height*left_width*left_channels*sizeof(unsigned char));
+	unsigned char left_image_data_arr[left_height][left_width][left_channels];
+	memcpy(left_image_data_arr, left_image_data, left_height*left_width*left_channels*sizeof(unsigned char));
 
 	array_to_png("input_dup.png", left_width, left_height, left_image_data);
 
@@ -62,25 +94,29 @@ int main() {
 	int right_channels;
 	unsigned char *right_image_data;
 	png_to_array("R_00001.png", &right_image_data, &right_height, &right_width, &right_channels);
-	//unsigned char right_image_data_arr[right_height][right_width][right_channels];
-	//memcpy(right_image_data_arr, right_image_data, right_height*right_width*right_channels*sizeof(unsigned char));
+	unsigned char right_image_data_arr[right_height][right_width][right_channels];
+	memcpy(right_image_data_arr, right_image_data, right_height*right_width*right_channels*sizeof(unsigned char));
 
 	assert(left_height == right_height);
 	assert(left_width == right_width);
+	assert(left_channels == right_channels);
 	assert(left_height < INT_MAX);
 	assert(left_width < INT_MAX);
 	int width = (int) left_width;
 	int height = (int) left_height;
+	int channels = left_channels;
+	assert(channels = 4);
 
 	int *disparities = malloc(height * width * sizeof(int));
 	for (int y = 0; y < height; y++) {
+		printf("Calculating disparity for row %d\n", y);
 		for (int x_left = 0; x_left < width; x_left++) {
 			bool started = false;
 			double min_difference = 0;
 			int best_x_right = -1;
 			for (int x_right = x_left - 150; x_right < x_left + 150; x_right++) {
 				if (!(x_right >= 0 && x_right < width)) continue;
-				double diff = distance(&left_image_data[(width*y + x_left)*4], &right_image_data[(width*y + x_right)*4]);
+				double diff = distance(width, height, channels, left_image_data_arr, right_image_data_arr, x_left, y, x_right, y);
 				if (!started || diff < min_difference) {
 					min_difference = diff;
 					best_x_right = x_right;
@@ -102,15 +138,12 @@ int main() {
 			int disparities_index = width*y + x;
 			int disparity = disparities[disparities_index];
 			int output_image_index = disparities_index * 4;
-			double disparity_scaled = (double) disparity / 150.0;
-			double distance = 1.0 / disparity_scaled;
-			double distance_scaled = 255.0 / distance;
-			assert(distance_scaled >= 0);
-			assert(distance_scaled <= 255);
-			unsigned char distance_output = (unsigned char) distance_scaled;
-			output_image[output_image_index + 0] = distance_output; //red
-			output_image[output_image_index + 1] = distance_output; //green
-			output_image[output_image_index + 2] = distance_output; //blue
+			double disparity_scaled = (double) disparity / 150.0 * 255.0;
+			int disparity_int = (int) round(disparity_scaled);
+			assert(disparity_scaled >= 0 && disparity_scaled <= 255);
+			output_image[output_image_index + 0] = disparity_int; //red
+			output_image[output_image_index + 1] = disparity_int; //green
+			output_image[output_image_index + 2] = disparity_int; //blue
 			output_image[output_image_index + 3] = 255;             //alpha
 		}
 	}
