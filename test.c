@@ -8,6 +8,8 @@
 #include "readpng.h"
 #include "write_png_file.h"
 
+#define window_radius 3
+
 // also see https://gist.github.com/niw/5963798
 // That might be simpler
 void png_to_array(char* filename, unsigned char **array_ptr, unsigned long *height, unsigned long *width, int *channels) {
@@ -67,10 +69,10 @@ double distance_single_pixel(unsigned char *left, unsigned char *right) {
 double distance(int width, int height, int channels, unsigned char left_image[height][width][channels], unsigned char right_image[height][width][channels], int x_left, int y_left, int x_right, int y_right) {
 	double sum = 0;
 	int num_pixels_compared = 0;
-	int x_offset_start = -2 + max(0, 2 - min(x_left, x_right));
-	int y_offset_start = -2 + max(0, 2 - min(y_left, y_right));
-	int x_offset_end = 2 - max(0, 2 - min(width-1 - x_left, width-1 - x_right));
-	int y_offset_end = 2 - max(0, 2 - min(height-1 - y_left, height-1 - y_right));
+	int x_offset_start = -window_radius + max(0, window_radius - min(x_left, x_right));
+	int y_offset_start = -window_radius + max(0, window_radius - min(y_left, y_right));
+	int x_offset_end = window_radius - max(0, window_radius - min(width-1 - x_left, width-1 - x_right));
+	int y_offset_end = window_radius - max(0, window_radius - min(height-1 - y_left, height-1 - y_right));
 	for (int x_offset = x_offset_start; x_offset <= x_offset_end; x_offset++) {
 		for (int y_offset = y_offset_start; y_offset <= y_offset_end; y_offset++) {
 			sum += distance_single_pixel(&left_image[y_left + y_offset][x_left + x_offset][0], &right_image[y_right + y_offset][x_right + x_offset][0]);
