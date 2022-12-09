@@ -1,7 +1,7 @@
 # for debugging
 CC = gccx
 # for speed
-#CC = gcc -O2
+#CC = clang -O3 -funroll-loops
 
 MATH=-lm
 ZLIB=-lz
