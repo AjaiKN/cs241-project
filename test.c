@@ -116,7 +116,7 @@ int main() {
 			bool started = false;
 			double min_difference = 0;
 			int best_x_right = -1;
-			for (int x_right = x_left - 150; x_right < x_left + 150; x_right++) {
+			for (int x_right = x_left - 100; x_right < x_left; x_right++) {
 				if (!(x_right >= 0 && x_right < width)) continue;
 				double diff = distance(width, height, channels, left_image_data_arr, right_image_data_arr, x_left, y, x_right, y);
 				if (!started || diff < min_difference) {
@@ -140,7 +140,7 @@ int main() {
 			int disparities_index = width*y + x;
 			int disparity = disparities[disparities_index];
 			int output_image_index = disparities_index * 4;
-			double disparity_scaled = (double) disparity / 150.0 * 255.0;
+			double disparity_scaled = (double) disparity / 100.0 * 255.0;
 			int disparity_int = (int) round(disparity_scaled);
 			assert(disparity_scaled >= 0 && disparity_scaled <= 255);
 			output_image[output_image_index + 0] = disparity_int; //red
