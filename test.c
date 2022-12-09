@@ -107,7 +107,7 @@ int main() {
 	int width = (int) left_width;
 	int height = (int) left_height;
 	int channels = left_channels;
-	assert(channels = 4);
+	assert(channels == 4);
 
 	int *disparities = malloc(height * width * sizeof(int));
 	for (int y = 0; y < height; y++) {
