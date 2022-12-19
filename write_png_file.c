@@ -71,6 +71,9 @@ void write_png_file(char *filename, int width, int height, png_bytep *row_pointe
   png_destroy_write_struct(&png, &info);
 }
 
+/**
+ * Write the given height X width X 4 array to a PNG file with the given filename.
+ */
 void array_to_png(char *filename, int width, int height, unsigned char *array) {
 	printf("Printing!\n");
 	// NOTE: png_byte = unsigned char
