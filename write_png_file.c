@@ -2,7 +2,25 @@
 #include <stdio.h>
 #include "libpng/png.h"
 
-// from https://gist.github.com/niw/5963798
+/*
+ * This function is from https://gist.github.com/niw/5963798, modified for our purposes
+ *
+ * A simple libpng example program
+ * http://zarb.org/~gc/html/libpng.html
+ *
+ * Modified by Yoshimasa Niwa to make it much simpler
+ * and support all defined color_type.
+ *
+ * To build, use the next instruction on OS X.
+ * $ brew install libpng
+ * $ clang -lz -lpng16 libpng_test.c
+ *
+ * Copyright 2002-2010 Guillaume Cottenceau.
+ *
+ * This software may be freely redistributed under the terms
+ * of the X11 license.
+ *
+ */
 void write_png_file(char *filename, int width, int height, png_bytep *row_pointers) {
   //int y; //unused variable, not sure why this was here -Ajai
 
