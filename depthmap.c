@@ -8,7 +8,8 @@
 #include "readpng.h"
 #include "write_png_file.h"
 
-#define window_radius 5
+#define window_radius (5)
+#define PROPORTION_SEARCH_DISTANCE (0.15625)
 
 // also see https://gist.github.com/niw/5963798
 // That might be simpler
@@ -114,14 +115,16 @@ int main(int argc, char *argv[]) {
 	int channels = left_channels;
 	assert(channels == 4);
 
+	int search_distance = (int) (PROPORTION_SEARCH_DISTANCE * width);
+
 	int *disparities = malloc(height * width * sizeof(int));
 	for (int y = 0; y < height; y++) {
-		printf("Calculating disparity for row %d\n", y);
+		if (y % 10 == 0) printf("%d%% done calculating\n", (int) (100.0 * (double) y / height));
 		for (int x_left = 0; x_left < width; x_left++) {
 			bool started = false;
 			double min_difference = 0;
 			int best_x_right = -1;
-			for (int x_right = x_left - 100; x_right < x_left; x_right++) {
+			for (int x_right = x_left - search_distance; x_right < x_left; x_right++) {
 				if (!(x_right >= 0 && x_right < width)) continue;
 				double diff = distance(width, height, channels, left_image_data_arr, right_image_data_arr, x_left, y, x_right, y);
 				if (!started || diff < min_difference) {
@@ -145,7 +148,7 @@ int main(int argc, char *argv[]) {
 			int disparities_index = width*y + x;
 			int disparity = disparities[disparities_index];
 			int output_image_index = disparities_index * 4;
-			double disparity_scaled = (double) disparity / 100.0 * 255.0;
+			double disparity_scaled = (double) disparity / (double) search_distance * 255.0;
 			int disparity_int = (int) round(disparity_scaled);
 			assert(disparity_scaled >= 0 && disparity_scaled <= 255);
 			output_image[output_image_index + 0] = disparity_int; //red
