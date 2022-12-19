@@ -8,7 +8,7 @@
 #include "readpng.h"
 #include "write_png_file.h"
 
-#define window_radius 3
+#define window_radius 5
 
 // also see https://gist.github.com/niw/5963798
 // That might be simpler
