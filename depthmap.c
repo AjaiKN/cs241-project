@@ -8,7 +8,7 @@
 #include "readpng.h"
 #include "write_png_file.h"
 
-#define window_radius (5)
+#define WINDOW_RADIUS (5)
 #define PROPORTION_SEARCH_DISTANCE (0.15625)
 
 // also see https://gist.github.com/niw/5963798
@@ -70,10 +70,10 @@ double distance_single_pixel(unsigned char *left, unsigned char *right) {
 double distance(int width, int height, int channels, unsigned char (*left_image)[width][channels], unsigned char (*right_image)[width][channels], int x_left, int y_left, int x_right, int y_right) {
 	double sum = 0;
 	int num_pixels_compared = 0;
-	int x_offset_start = -window_radius + max(0, window_radius - min(x_left, x_right));
-	int y_offset_start = -window_radius + max(0, window_radius - min(y_left, y_right));
-	int x_offset_end = window_radius - max(0, window_radius - min(width-1 - x_left, width-1 - x_right));
-	int y_offset_end = window_radius - max(0, window_radius - min(height-1 - y_left, height-1 - y_right));
+	int x_offset_start = -WINDOW_RADIUS + max(0, WINDOW_RADIUS - min(x_left, x_right));
+	int y_offset_start = -WINDOW_RADIUS + max(0, WINDOW_RADIUS - min(y_left, y_right));
+	int x_offset_end = WINDOW_RADIUS - max(0, WINDOW_RADIUS - min(width-1 - x_left, width-1 - x_right));
+	int y_offset_end = WINDOW_RADIUS - max(0, WINDOW_RADIUS - min(height-1 - y_left, height-1 - y_right));
 	for (int x_offset = x_offset_start; x_offset <= x_offset_end; x_offset++) {
 		for (int y_offset = y_offset_start; y_offset <= y_offset_end; y_offset++) {
 			sum += distance_single_pixel(&left_image[y_left + y_offset][x_left + x_offset][0], &right_image[y_right + y_offset][x_right + x_offset][0]);
