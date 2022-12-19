@@ -11,8 +11,6 @@
 #define WINDOW_RADIUS (5)
 #define PROPORTION_SEARCH_DISTANCE (0.15625)
 
-// also see https://gist.github.com/niw/5963798
-// That might be simpler
 void png_to_array(char* filename, unsigned char **array_ptr, unsigned long *height, unsigned long *width, int *channels) {
 	readpng_version_info();
 
