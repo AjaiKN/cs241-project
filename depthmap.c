@@ -82,20 +82,25 @@ double distance(int width, int height, int channels, unsigned char (*left_image)
 	return sum / num_pixels_compared;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+	if (argc < 4) {
+		printf("Please provide the names of the input and output files\n");
+		printf("\n");
+		printf("Usage: depthmap LEFT_IMAGE_PNG RIGHT_IMAGE_PNG OUTPUT_PNG\n");
+		return 1;
+	}
+
 	unsigned long left_height, left_width;
 	int left_channels;
 	unsigned char *left_image_data; // height*width*channels
-	png_to_array("L_00001.png", &left_image_data, &left_height, &left_width, &left_channels);
+	png_to_array(argv[1], &left_image_data, &left_height, &left_width, &left_channels);
 	unsigned char (*left_image_data_arr)[left_width][left_channels] = malloc(left_height*left_width*left_channels*sizeof(unsigned char));
 	memcpy(left_image_data_arr, left_image_data, left_height*left_width*left_channels*sizeof(unsigned char));
-
-	array_to_png("input_dup.png", left_width, left_height, left_image_data);
 
 	unsigned long right_height, right_width;
 	int right_channels;
 	unsigned char *right_image_data;
-	png_to_array("R_00001.png", &right_image_data, &right_height, &right_width, &right_channels);
+	png_to_array(argv[2], &right_image_data, &right_height, &right_width, &right_channels);
 	unsigned char (*right_image_data_arr)[right_width][right_channels] = malloc(right_height*right_width*right_channels*sizeof(unsigned char));
 	memcpy(right_image_data_arr, right_image_data, right_height*right_width*right_channels*sizeof(unsigned char));
 
@@ -146,7 +151,7 @@ int main() {
 			output_image[output_image_index + 0] = disparity_int; //red
 			output_image[output_image_index + 1] = disparity_int; //green
 			output_image[output_image_index + 2] = disparity_int; //blue
-			output_image[output_image_index + 3] = 255;             //alpha
+			output_image[output_image_index + 3] = 255;           //alpha
 		}
 	}
 	/*
@@ -156,7 +161,7 @@ int main() {
 	printf("\n");
 	for (int i = 0; i < width; i++) printf("%u ", output_image[i * 4]);
 	*/
-	array_to_png("output.png", width, height, output_image);
+	array_to_png(argv[3], width, height, output_image);
 
 	free(output_image);
 	free(disparities);
