@@ -7,14 +7,14 @@ MATH=-lm
 ZLIB=-lz
 LIBPNG=libpng/pngerror.o libpng/pngget.o libpng/pngmem.o libpng/png.o libpng/pngpread.o libpng/pngread.o libpng/pngrio.o libpng/pngrtran.o libpng/pngrutil.o libpng/pngset.o libpng/pngtrans.o libpng/pngwio.o libpng/pngwrite.o libpng/pngwtran.o libpng/pngwutil.o $(MATH) $(ZLIB)
 
-EXECUTABLES=test
+EXECUTABLES=depthmap
 
 all: $(EXECUTABLES)
 
-test: test.o readpng.o write_png_file.o
+depthmap: depthmap.o readpng.o write_png_file.o
 	$(CC) -o $@ $^ $(LIBPNG)
 
-test.o: test.c readpng.h write_png_file.h
+depthmap.o: depthmap.c readpng.h write_png_file.h
 	$(CC) -c -o $@ $<
 readpng.o: readpng.c
 	$(CC) -c -o $@ $<
